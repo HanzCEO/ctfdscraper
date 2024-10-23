@@ -23,7 +23,6 @@ app.post('/config', (req, res) => {
 });
 
 app.post('/challenge', (req, res) => {
-	res.end();
 	const cat = req.body.category.replace(/[^a-z0-9_\(\)\[\]\-]/gi, '');
 	const name = req.body.name.replace(/[^a-z0-9_\(\)\[\]\-]/gi, '');
 
@@ -42,7 +41,12 @@ app.post('/challenge', (req, res) => {
 			if (e) {
 				throw new Error(`Can't make README ${theDir}/README.md`);
 			}
-			console.log(`Written challange ${name} description`);
+			console.log(`Written challenge ${name} description`);
+			res.json({
+				...req.body,
+				category: cat,
+				name: name
+			});
 		});
 	});
 });
