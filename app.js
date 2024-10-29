@@ -1,9 +1,15 @@
 const fs = require('fs');
+const https = require('https');
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 
-const { Readable } = require('stream')
+const { Readable } = require('stream');
+
+const creds = {
+	key: fs.readFileSync('./server.key'),
+	cert: fs.readFileSync('./server.crt')
+};
 
 const app = express();
 let config = {
@@ -62,8 +68,8 @@ app.post('/challenge/:chalCategory/:chalName/attachment', upload.single('file'),
 	console.log(`Got file for ${cat}/${name}: ${req.file.originalname}. Saved to ${theDir}/${req.file.originalname}`);
 });
 
-app.post('/proxy', async (req, res) => {
-	const url = req.body.url;
+app.get('/proxy', async (req, res) => {
+	const url = req.query.url;
 	try {
 		const fetchResponse = await fetch(url);
 
@@ -83,6 +89,7 @@ app.post('/proxy', async (req, res) => {
 	}
 });
 
-app.listen(8080, () => {
+const server = https.createServer(creds, app);
+server.listen(8080, () => {
 	console.log("[i] Listened to localhost 8080");
 });
